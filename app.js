@@ -14,42 +14,7 @@ app.listen(port, () => {
     console.log('Servidor iniciado en: http://localhost:' + port);
 });
 
-//Ejemplo de cómo recuperar una lista de registros.
-app.get('/eventos', async (req, res) => {
-    const query = `
-        SELECT id, nombre, descripcion, cupo
-        FROM eventos
-    `;
-    try{
-        [results] = await connection.query(query);
-        res.json({ success: true, results });
-    }catch(error){
-        console.log(error);
-        res.status(500).json({ success: false, message: 'Error al intentar recuperar los eventos' });
-    }
-});
-
-
-//Ejemplo de cómo recuperar un registro por su ID.
-app.get('/eventos/:ID', async (req, res) => {
-    const {ID} = req.params;
-    const query = `
-        SELECT id, nombre, descripcion, cupo
-        FROM eventos
-        WHERE id = ?
-    `;
-    try{        
-        [results] = await connection.query(query, [ID]);
-        if(results.length < 1){
-            res.status(404).json({ success: false, message: 'El evento no existe' });
-        }else{
-            res.json({ success: true, result: results[0] });
-        }
-    }catch(error){
-        console.log(error);
-        res.status(500).json({ success: false, message: 'Error al intentar recuperar el evento' });
-    }
-});
+app.use(require("./src/routes/eventoRoute"));
 
 // Middleware para manejar el error 404
 app.use((req, res, next) => {
